@@ -1,0 +1,23 @@
+# Example tenant intent, NOT a Cisco NAC schema or deployment input.
+# All values require APIC capability review and explicit mapping to a pinned
+# module version. Never apply directly from this example.
+environment: lab
+
+# Tenant logical name. Must not collide with objects managed elsewhere.
+# Deletion/replacement can disrupt all dependent VRFs, BDs and EPGs.
+tenant_name: BIFROST-LAB
+
+# Routing domain placeholder. Define routing/leak policy before enabling.
+# Renames can trigger replacement; inspect the plan and endpoint impact.
+vrfs:
+  - name: LAB-VRF
+    # Document owner and rollback contact for policy changes.
+    owner: lab-operator
+
+# A BD requires explicit subnet, L2/L3 behavior and VRF dependencies.
+# Keep disabled until addressing and gateway placement are agreed.
+bridge_domains: []
+
+# Define contracts from a documented traffic matrix, least privilege first.
+# Do not use blanket permit rules as a default.
+contracts: []
