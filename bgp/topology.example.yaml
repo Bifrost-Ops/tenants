@@ -1,0 +1,46 @@
+# Bifrost planning inventory, NOT a Cisco NAC or Kubernetes manifest.
+# This file must not be passed to Terraform directly.
+# Replace every documentation address and placeholder before implementation.
+# Scope: per-cluster ACI L3Out peering design, explicit routing boundaries.
+# Recovery: preserve reviewed Git revision, remote Terraform state and APIC backup.
+schema: bifrost-bgp-topology-v1
+environment: example
+aci:
+  apic_version: REPLACE
+  fabric_name: REPLACE
+  tenant: SERVICE
+  vrf: REPLACE
+  l3out_name: REPLACE
+  external_epg: REPLACE
+  # L3Out routing peering requires validated node/interface profile topology.
+  leaf_node_profiles:
+    - leaf_id: REPLACE_LEAF_A
+      interface_profile: REPLACE_PROFILE_A
+      interface_type: routed
+      # Documentation-only transit address, not usable in production.
+      transit_ip: 192.0.2.1/30
+    - leaf_id: REPLACE_LEAF_B
+      interface_profile: REPLACE_PROFILE_B
+      interface_type: routed
+      transit_ip: 198.51.100.1/30
+  # Example peer ASN only; actual ASN allocation is site-specific.
+  bgp_asn: 65000
+kubernetes:
+  cluster_name: service
+  cilium_local_asn: 65010
+  # Must map to a validated reachable BGP speaker/router, not assumed EPG.
+  peers:
+    - name: upstream-a
+      address: 192.0.2.1
+    - name: upstream-b
+      address: 198.51.100.1
+  # Explicit service VIP advertisement; no PodCIDR export in initial phase.
+  allowed_vip_prefixes:
+    - 203.0.113.0/28
+controls:
+  # Apply max-prefix and route filtering at supported upstream routing boundary.
+  max_prefixes_per_peer: 32
+  bgp_authentication: EXTERNAL_SECRET_REQUIRED
+  prechange_apic_backup: REQUIRED
+  terraform_state_backend: EXTERNAL_ENCRYPTED_LOCKED_REQUIRED
+  emergency_oob: REQUIRED
