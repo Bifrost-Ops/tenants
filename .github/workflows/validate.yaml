@@ -1,0 +1,23 @@
+# Static validation only. This workflow NEVER connects to infrastructure,
+# creates Terraform state, or runs terraform apply/destroy.
+name: Validate configuration examples
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  yaml-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned YAML linter
+        run: python -m pip install yamllint==1.35.1
+      - name: Validate all YAML files
+        run: yamllint -c .yamllint .
